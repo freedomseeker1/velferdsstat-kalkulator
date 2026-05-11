@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Velferdsstatens balanse - prototype</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Bærekraftskalkulator</p>
+        <h1>Velferdsstatens balanse</h1>
+      </div>
+      <div class="topbar__meta">
+        <span>Prototype 0.19</span>
+        <span>Realistisk basis med justerbare forutsetninger</span>
+        <span>Faste 2025-kroner</span>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="control-panel" aria-label="Forutsetninger">
+        <section class="panel-section">
+          <h2>Hovedforutsetninger</h2>
+          <p class="standard-note">Standardverdiene er startpunktet kalkulatoren åpner med. De bygger på register- og statistikkilder der vi har tall, og ellers på synlige modellforutsetninger. Når du flytter en verdi, tester du din egen forutsetning.</p>
+          <div class="control">
+            <div class="control__label">
+              <label for="netImmigration">Nettoinnvandring</label>
+              <output id="netImmigrationValue" for="netImmigration"></output>
+            </div>
+            <input id="netImmigration" type="range" min="5" max="90" step="1">
+          </div>
+
+          <div class="control">
+            <div class="control__label">
+              <label for="employmentStart">Sysselsetting første år</label>
+              <output id="employmentStartValue" for="employmentStart"></output>
+            </div>
+            <input id="employmentStart" type="range" min="0" max="85" step="1">
+          </div>
+
+          <div class="control">
+            <div class="control__label">
+              <label for="employment10">Sysselsetting etter 10 år</label>
+              <output id="employment10Value" for="employment10"></output>
+            </div>
+            <input id="employment10" type="range" min="40" max="90" step="1">
+          </div>
+
+          <div class="control">
+            <div class="control__label">
+              <label for="relativeWage">Lønn relativt til øvrig median</label>
+              <output id="relativeWageValue" for="relativeWage"></output>
+            </div>
+            <input id="relativeWage" type="range" min="45" max="115" step="1">
+          </div>
+
+          <div class="control">
+            <div class="control__label">
+              <label for="benefitTransition">Trygdeovergang 10+ år</label>
+              <output id="benefitTransitionValue" for="benefitTransition"></output>
+            </div>
+            <input id="benefitTransition" type="range" min="3" max="45" step="1">
+          </div>
+
+          <div class="control">
+            <div class="control__label">
+              <label for="wagePressure">Lønnseffekt lav utdanning</label>
+              <output id="wagePressureValue" for="wagePressure"></output>
+            </div>
+            <input id="wagePressure" type="range" min="-6" max="1" step="0.1">
+          </div>
+        </section>
+
+        <button class="advanced-toggle" type="button" id="advancedToggle" aria-expanded="false" aria-controls="advancedControls">Avanserte innstillinger</button>
+
+        <div class="advanced-controls" id="advancedControls" hidden>
+          <section class="panel-section">
+            <h2>Innvandring</h2>
+            <div class="control">
+              <div class="control__label">
+                <label for="labourShare">Arbeidsinnvandring</label>
+                <output id="labourShareValue" for="labourShare"></output>
+              </div>
+              <input id="labourShare" type="range" min="5" max="90" step="1">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="highSkillShare">Høykompetanseandel</label>
+                <output id="highSkillShareValue" for="highSkillShare"></output>
+              </div>
+              <input id="highSkillShare" type="range" min="5" max="90" step="1">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="workingAgeShare">Arbeidsfør andel ved ankomst</label>
+                <output id="workingAgeShareValue" for="workingAgeShare"></output>
+              </div>
+              <input id="workingAgeShare" type="range" min="35" max="85" step="1">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="elderDependentShare">Eldre/omsorg blant ikke-arbeidsføre</label>
+                <output id="elderDependentShareValue" for="elderDependentShare"></output>
+              </div>
+              <input id="elderDependentShare" type="range" min="0" max="45" step="1">
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h2>Arbeidsmarked</h2>
+            <div class="control">
+              <div class="control__label">
+                <label for="workIntensity">Arbeidsintensitet</label>
+                <output id="workIntensityValue" for="workIntensity"></output>
+              </div>
+              <input id="workIntensity" type="range" min="35" max="100" step="1">
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h2>Offentlig sektor</h2>
+            <div class="control">
+              <div class="control__label">
+                <label for="serviceCost">Tjenestekostnad per person</label>
+                <output id="serviceCostValue" for="serviceCost"></output>
+              </div>
+              <input id="serviceCost" type="range" min="100" max="360" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="supplementCost">Familie-/bostøttepakke</label>
+                <output id="supplementCostValue" for="supplementCost"></output>
+              </div>
+              <input id="supplementCost" type="range" min="0" max="160" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="remittanceShare">Pengeeksport av inntekt</label>
+                <output id="remittanceShareValue" for="remittanceShare"></output>
+              </div>
+              <input id="remittanceShare" type="range" min="0" max="30" step="1">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="housingExemptShare">Momsfri boligandel</label>
+                <output id="housingExemptShareValue" for="housingExemptShare"></output>
+              </div>
+              <input id="housingExemptShare" type="range" min="0" max="70" step="1">
+            </div>
+          </section>
+
+          <section class="panel-section">
+            <h2>Livsløp</h2>
+            <div class="control">
+              <div class="control__label">
+                <label for="flowYears">År med samme innvandringsnivå</label>
+                <output id="flowYearsValue" for="flowYears"></output>
+              </div>
+              <input id="flowYears" type="range" min="1" max="100" step="1">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="projectionYears">År regningen summeres</label>
+                <output id="projectionYearsValue" for="projectionYears"></output>
+              </div>
+              <input id="projectionYears" type="range" min="50" max="180" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="secondGenRate">Etterkommere per 100 ankomne</label>
+                <output id="secondGenRateValue" for="secondGenRate"></output>
+              </div>
+              <input id="secondGenRate" type="range" min="0" max="140" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="childCost">Barn/skole/tiltak per barn</label>
+                <output id="childCostValue" for="childCost"></output>
+              </div>
+              <input id="childCost" type="range" min="80" max="320" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="secondGenAdultCost">Etterkommer 22+ nettokostnad</label>
+                <output id="secondGenAdultCostValue" for="secondGenAdultCost"></output>
+              </div>
+              <input id="secondGenAdultCost" type="range" min="-80" max="180" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="thirdGenRate">Tredje generasjon per 100 etterkommere</label>
+                <output id="thirdGenRateValue" for="thirdGenRate"></output>
+              </div>
+              <input id="thirdGenRate" type="range" min="0" max="160" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="thirdGenChildCost">Tredje gen. barn/skole/tiltak</label>
+                <output id="thirdGenChildCostValue" for="thirdGenChildCost"></output>
+              </div>
+              <input id="thirdGenChildCost" type="range" min="0" max="320" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="thirdGenAdultCost">Tredje gen. 22+ nettokostnad</label>
+                <output id="thirdGenAdultCostValue" for="thirdGenAdultCost"></output>
+              </div>
+              <input id="thirdGenAdultCost" type="range" min="-80" max="180" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="elderReserveCost">Alderdomsreserve 35+ år</label>
+                <output id="elderReserveCostValue" for="elderReserveCost"></output>
+              </div>
+              <input id="elderReserveCost" type="range" min="0" max="140" step="5">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="elderDependentBenefitCost">Minstepensjon/Stønad</label>
+                <output id="elderDependentBenefitCostValue" for="elderDependentBenefitCost"></output>
+              </div>
+              <input id="elderDependentBenefitCost" type="range" min="0" max="500" step="10">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="elderCareShare">Tung omsorgsandel 35+ år</label>
+                <output id="elderCareShareValue" for="elderCareShare"></output>
+              </div>
+              <input id="elderCareShare" type="range" min="0" max="45" step="1">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="elderCareCost">Prislapp sykehjemsplass</label>
+                <output id="elderCareCostValue" for="elderCareCost"></output>
+              </div>
+              <input id="elderCareCost" type="range" min="400" max="2200" step="50">
+            </div>
+
+            <div class="control">
+              <div class="control__label">
+                <label for="secondGenElderReserveCost">Etterkommer aldringsreserve</label>
+                <output id="secondGenElderReserveCostValue" for="secondGenElderReserveCost"></output>
+              </div>
+              <input id="secondGenElderReserveCost" type="range" min="0" max="180" step="5">
+            </div>
+          </section>
+
+        </div>
+
+        <div class="control-actions">
+          <button class="reset-button" type="button" id="resetDefaults">Tilbakestill til standardverdier</button>
+          <button class="export-button" type="button" id="downloadCsv">CSV</button>
+        </div>
+      </aside>
+
+      <section class="dashboard" aria-label="Resultater">
+        <section class="hero-strip">
+          <div>
+            <p class="eyebrow">Årlig virkning ved år-10-nivå</p>
+            <h2 id="scenarioTitle">Realistisk basis</h2>
+          </div>
+          <div class="confidence">
+            <span class="confidence__label">Modenhet</span>
+            <strong>Prototype</strong>
+            <dl class="confidence__facts">
+              <div>
+                <dt>Skatt</dt>
+                <dd id="taxProfileValue"></dd>
+              </div>
+              <div>
+                <dt>Medianbasert årslønn</dt>
+                <dd id="avgWageValue"></dd>
+              </div>
+              <div>
+                <dt>SSB median 2025</dt>
+                <dd id="medianSourceValue"></dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="Nokkeltall">
+          <article class="metric metric--income">
+            <span>Skatt og avgifter</span>
+            <strong id="taxRevenueMetric"></strong>
+            <small>ved år-10 sysselsetting</small>
+          </article>
+          <article class="metric metric--cost">
+            <span>Ytelser og tjenester</span>
+            <strong id="costMetric"></strong>
+            <small>inkl. overgang til trygd</small>
+          </article>
+          <article class="metric metric--wage">
+            <span>Lønnseffekt</span>
+            <strong id="wageMetric"></strong>
+            <small>lav utdanning / utsatte sektorer</small>
+          </article>
+          <article class="metric metric--gap">
+            <span>Årlig regning</span>
+            <strong id="gapMetric"></strong>
+            <small>må dekkes over statsbudsjettet</small>
+          </article>
+        </section>
+
+        <section class="explain-grid" aria-label="Forklaring">
+          <article class="explain-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Forklaring</p>
+                <h2>Hvorfor endret tallet seg?</h2>
+              </div>
+            </div>
+            <p id="changeExplanation">Dra i en slider for å se hva den påvirker i regnestykket.</p>
+          </article>
+
+          <article class="explain-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Drivere</p>
+                <h2>Hva driver regningen?</h2>
+              </div>
+            </div>
+            <ol class="driver-list" id="driverList"></ol>
+          </article>
+        </section>
+
+        <section class="balance-grid">
+          <article class="balance-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Flyt</p>
+                <h2>Inntekter og utgifter</h2>
+              </div>
+              <span id="balancePill" class="pill"></span>
+            </div>
+
+            <div class="flow-columns">
+              <div class="flow-column">
+                <h3>Inntekter</h3>
+                <div class="flow-row">
+                  <span>Arbeidsskatt (eff.)</span>
+                  <strong id="directTaxLabel"></strong>
+                  <div class="bar"><span id="directTaxBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Avgifter</span>
+                  <strong id="indirectTaxLabel"></strong>
+                  <div class="bar"><span id="indirectTaxBar"></span></div>
+                </div>
+              </div>
+
+              <div class="flow-column">
+                <h3>Utgifter</h3>
+                <div class="flow-row">
+                  <span>Trygderelaterte ytelser</span>
+                  <strong id="benefitLabel"></strong>
+                  <div class="bar bar--cost"><span id="benefitBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Familie/bostøtte/sosialhjelp</span>
+                  <strong id="supplementLabel"></strong>
+                  <div class="bar bar--cost"><span id="supplementBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Barn/skole/tiltak</span>
+                  <strong id="childLabel"></strong>
+                  <div class="bar bar--cost"><span id="childBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Etterkommere 22+</span>
+                  <strong id="secondGenAdultLabel"></strong>
+                  <div class="bar bar--cost"><span id="secondGenAdultBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Tredje generasjon barn</span>
+                  <strong id="thirdGenLabel"></strong>
+                  <div class="bar bar--cost"><span id="thirdGenBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Tredje generasjon 22+</span>
+                  <strong id="thirdGenAdultLabel"></strong>
+                  <div class="bar bar--cost"><span id="thirdGenAdultBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Alderdomsreserve</span>
+                  <strong id="elderReserveLabel"></strong>
+                  <div class="bar bar--cost"><span id="elderReserveBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Minstepensjon/Stønad</span>
+                  <strong id="elderDependentBenefitLabel"></strong>
+                  <div class="bar bar--cost"><span id="elderDependentBenefitBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Sykehjemsplass reserve</span>
+                  <strong id="elderCareLabel"></strong>
+                  <div class="bar bar--cost"><span id="elderCareBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Etterkommer aldring</span>
+                  <strong id="secondGenElderLabel"></strong>
+                  <div class="bar bar--cost"><span id="secondGenElderBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Kommunale/statlige tjenester</span>
+                  <strong id="servicesLabel"></strong>
+                  <div class="bar bar--cost"><span id="servicesBar"></span></div>
+                </div>
+                <div class="flow-row">
+                  <span>Skattetap fra lønnspress</span>
+                  <strong id="wageLossLabel"></strong>
+                  <div class="bar bar--cost"><span id="wageLossBar"></span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="funding-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Statsbudsjett</p>
+                <h2>Regning som må dekkes</h2>
+              </div>
+            </div>
+            <dl class="compact-list">
+              <div>
+                <dt>Årlig trekk ved år 10</dt>
+                <dd id="annualNeedValue"></dd>
+              </div>
+              <div>
+                <dt>Største årlige trekk</dt>
+                <dd id="peakAnnualNeedValue"></dd>
+              </div>
+              <div>
+                <dt id="cumulativeNeedLabel">Akkumulert behov</dt>
+                <dd id="cumulativeNeedValue"></dd>
+              </div>
+            </dl>
+          </article>
+        </section>
+
+        <section class="charts-grid">
+          <article class="chart-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Botid</p>
+                <h2>Arbeid og trygd</h2>
+              </div>
+            </div>
+            <canvas id="trajectoryChart" width="760" height="320" aria-label="Utvikling i sysselsetting og trygdeovergang over botid"></canvas>
+          </article>
+
+          <article class="chart-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow" id="fiscalHorizonLabel">150 år</p>
+                <h2>Akkumulert finansieringsbehov</h2>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="fiscalChart" width="760" height="320" aria-label="Akkumulert finansieringsbehov med løpende årlige kohorter"></canvas>
+              <div id="fiscalTooltip" class="chart-tooltip" hidden></div>
+            </div>
+          </article>
+
+          <article class="timeline-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Historikk</p>
+                <h2>Perspektivmeldingene</h2>
+              </div>
+            </div>
+            <ol class="timeline">
+              <li><strong>2009</strong><span>Arbeid, fordeling og langsiktig offentlig bærekraft.</span></li>
+              <li><strong>2013</strong><span>Aldrende befolkning og framskrivinger for offentlige finanser.</span></li>
+              <li><strong>2017</strong><span>Omstilling, produktivitet, innvandring og videreforing av velferdsordninger.</span></li>
+              <li><strong>2021</strong><span>Sysselsettingsscenarioer og langsiktig finansiering.</span></li>
+              <li><strong>2024</strong><span>Arbeidskraftbehov, aldring og handlingsrom.</span></li>
+            </ol>
+          </article>
+        </section>
+
+        <section class="data-grid">
+          <article class="table-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Utland</p>
+                <h2>Sammenligningspunkter</h2>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Land/kilde</th>
+                  <th>Hva modellen bør hente</th>
+                  <th>Foreløpig signal</th>
+                </tr>
+              </thead>
+              <tbody id="benchmarkRows"></tbody>
+            </table>
+          </article>
+
+          <article class="source-board">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Kildelog</p>
+                <h2>Datagrunnlag</h2>
+              </div>
+            </div>
+            <ul class="source-list" id="sourceList"></ul>
+          </article>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
