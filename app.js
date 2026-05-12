@@ -108,7 +108,7 @@ const controlEvidence = {
   },
   relativeWage: {
     kind: "Statistikk",
-    text: "Lønnsnivået er knyttet til SSBs medianlønn etter bosattgruppe og landbakgrunn.",
+    text: "Lønnsnivået gjelder SSBs median månedslønn blant dem som faktisk har lønnet arbeid.",
     up: "Høyere lønn øker arbeidsskatt og avgifter fra innenlandsk forbruk.",
     down: "Lavere lønn reduserer både arbeidsskatt og avgifter."
   },
@@ -293,7 +293,7 @@ const controlMeanings = {
   netImmigration: "antall netto nye personer per år som legges inn som nye kohorter.",
   employmentStart: "andel av arbeidsføre som antas å være i jobb rett etter ankomst.",
   employment10: "andel av arbeidsføre som antas å være i jobb etter 10 års botid.",
-  relativeWage: "årslønn i prosent av medianlønnen for øvrige bosatte.",
+  relativeWage: "årslønn i prosent av medianlønnen blant øvrige bosatte med lønnet arbeid.",
   benefitTransition: "andel av arbeidsføre som over tid mottar trygderelaterte ytelser.",
   wagePressure: "beregnet lønnseffekt for lavere utdannede arbeidstakere i Norge.",
   labourShare: "andel av ankomstene som behandles som arbeidsrettet i modellens arbeidsmarkedsprofil.",
@@ -348,12 +348,12 @@ const sources = [
   },
   {
     title: "SSB tabell 12524",
-    note: "Median månedslønn 2025: innvandrere 48 910 kr, øvrige bosatte 57 930 kr.",
+    note: "Median månedslønn blant dem med lønnet arbeid i 2025: innvandrere 48 910 kr, øvrige bosatte 57 930 kr.",
     url: "https://www.ssb.no/statbank/table/12524/"
   },
   {
     title: "SSB tabell 12525",
-    note: "Median månedslønn 2025 etter landbakgrunn: nye EU-land 47 220 kr, Asia 47 440 kr, Afrika 46 100 kr.",
+    note: "Median månedslønn blant dem med lønnet arbeid i 2025 etter landbakgrunn: nye EU-land 47 220 kr, Asia 47 440 kr, Afrika 46 100 kr.",
     url: "https://www.ssb.no/statbank/table/12525/"
   },
   {
@@ -703,11 +703,6 @@ function updateMetrics(result) {
   document.getElementById("costMetric").textContent = formatBn(-result.totalCost);
   document.getElementById("wageMetric").textContent = `${formatSigned(state.wagePressure, " %")}`;
   document.getElementById("gapMetric").textContent = formatNeedBn(result.gapBeforeOil);
-  document.getElementById("taxProfileValue").textContent = `${NOK.format(result.effectiveTaxRate * 100)} % effektiv`;
-  document.getElementById("avgWageValue").textContent = `${INTEGER.format(result.wage)} kr`;
-  document.getElementById("medianSourceValue").textContent =
-    `${INTEGER.format(MEDIAN_MONTHLY_WAGE_IMMIGRANTS)} / ${INTEGER.format(MEDIAN_MONTHLY_WAGE_OTHER_RESIDENTS)} kr mnd.`;
-
   document.getElementById("directTaxLabel").textContent = formatBn(result.directTax);
   document.getElementById("indirectTaxLabel").textContent = formatBn(result.indirectTax);
   document.getElementById("benefitLabel").textContent = formatBn(-result.benefitCost);
